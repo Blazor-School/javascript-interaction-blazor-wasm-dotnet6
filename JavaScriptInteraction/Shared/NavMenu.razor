@@ -1,0 +1,64 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">JavaScriptInteraction</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="load-wwwroot-js">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Load External JS
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="load-collocate-js">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Collocate JS
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="isolated-js">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Isolated JS
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="call-js">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Call JS
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="call-csharp">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Call C#
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="try-to-remove-blazor-dom">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Try to Remove Blazor DOM (Common Mistake)
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="calling-loop">
+                <span class="oi oi-infinity" aria-hidden="true"></span> Calling Loop (Common Mistake)
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

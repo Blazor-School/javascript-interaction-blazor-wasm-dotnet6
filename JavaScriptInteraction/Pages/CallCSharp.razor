@@ -1,0 +1,100 @@
+﻿@page "/call-csharp"
+@using JavaScriptInteraction.Models
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<h3>CallCSharp</h3>
+<div>String data: @ExampleInstance.ExampleString</div>
+<div>Number data: @ExampleInstance.ExampleInt</div>
+<div>Date data: @ExampleInstance.ExampleDate</div>
+<button class="btn btn-primary" @onclick="CallSynchronousMethodAsync">Call Synchronous Method</button>
+<button class="btn btn-primary" @onclick="CallAsynchronousMethodAsync">Call Asynchronous Method</button>
+<button class="btn btn-primary" onclick="callStaticLocalComponentMethod()">Call Local Static Method</button>
+<button class="btn btn-primary" @onclick="CallLocalComponentMethod">Call Local Component Method</button>
+<button class="btn btn-primary" @onclick="CallMethodWithPrimitiveParameters">Call Primitive Parameterized Method</button>
+<button class="btn btn-primary" @onclick="CallMethodWithReferenceParameters">Call Reference Parameterized Method</button>
+<button class="btn btn-primary" @onclick="HandlePrimitiveDataReturnMethod">Handle Primitive Data Return Method</button>
+<button class="btn btn-outline-danger" @onclick="HandleToupleDataReturnMethod">Handle Touple Data Return Method (Not Support)</button>
+<button class="btn btn-primary" @onclick="HandleReferenceDataReturnMethod">Handle Reference Data Return Method</button>
+@code {
+    private Lazy<IJSObjectReference> ExampleModule = new();
+    private static ExampleClass ExampleInstance { get; set; } = new()
+    {
+        ExampleDate = DateTime.Now,
+        ExampleInt = 100,
+        ExampleString = Guid.NewGuid().ToString()
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ExampleModule = new(await JS.InvokeAsync<IJSObjectReference>("import", "./js/example.js"));
+        }
+    }
+
+    public async Task CallSynchronousMethodAsync()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callSynchronousCSharpMethod", wrappedInstance);
+    }
+
+    public async Task CallAsynchronousMethodAsync()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callAsynchronousCSharpMethod", wrappedInstance);
+    }
+
+    public async Task CallLocalComponentMethod()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(this);
+        await ExampleModule.Value.InvokeVoidAsync("callLocalComponentMethod", wrappedInstance);
+    }
+
+    public async Task CallMethodWithPrimitiveParameters()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callPrimitiveParameterizedCSharpMethod", wrappedInstance);
+    }
+    
+    public async Task CallMethodWithReferenceParameters()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callReferenceParameterizedCSharpMethod", wrappedInstance);
+    }
+
+    [JSInvokable]
+    public void LocalMethod()
+    {
+        ExampleInstance.ExampleString = $"{nameof(LocalMethod)} called";
+    }
+
+    [JSInvokable]
+    public static string LocalStaticMethod() => $"{nameof(LocalStaticMethod)} called";
+
+    public async Task HandlePrimitiveDataReturnMethod()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callPrimitiveDataReturnMethod", wrappedInstance);
+    }
+
+    public async Task HandleToupleDataReturnMethod()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callToupleDataReturnMethod", wrappedInstance);
+    }
+
+    public async Task HandleReferenceDataReturnMethod()
+    {
+        var wrappedInstance = DotNetObjectReference.Create(ExampleInstance);
+        await ExampleModule.Value.InvokeVoidAsync("callReferenceDataReturnMethod", wrappedInstance);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (ExampleModule.IsValueCreated)
+        {
+            await ExampleModule.Value.DisposeAsync();
+        }
+    }
+}
